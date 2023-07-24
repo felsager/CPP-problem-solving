@@ -12,9 +12,10 @@
 #include <ctime>
 
 #pragma GCC optimize("Ofast,inline") // Ofast = O3,fast-math,allow-store-data-races,no-protect-parens
-#pragma GCC optimize ("unroll-loops")
+//#pragma GCC optimize ("unroll-loops")
 
-constexpr const int MAX_N = 4e5;
+constexpr const int N_BITSET = 4e5;
+constexpr const int N_MAX = 4e5;
 constexpr int unroll_factor = 4;
 
 using namespace std;
@@ -22,7 +23,7 @@ using namespace std;
 class CustomBitset {
 public:
     static const int BITS_PER_BLOCK = 64;
-    static const int BLOCK_COUNT = (MAX_N + BITS_PER_BLOCK - 1) / BITS_PER_BLOCK;
+    static const int BLOCK_COUNT = (N_BITSET + BITS_PER_BLOCK - 1) / BITS_PER_BLOCK;
 
     CustomBitset() {
         reset();
@@ -44,22 +45,23 @@ private:
     uint64_t blocks[BLOCK_COUNT];
 };
 
-int winning_instances(const vector<int>& board, const int n) {
+int winning_instances(int board[], const int n) {
     int no_wins = 0; // number of winning instances
     int num_full_blocks = n - (n % 4);
     int board_val;
     bool cycle;
     bool outside;
-    unordered_set<int> magic_numbers; // unique magic numbers
-    vector<int> pre_wins(n); // tiles where the no. wins from that tile is noted
+    unordered_set<int> magic_numbers(board, board + N_MAX); // unique magic numbers
+    short pre_wins[N_MAX]; // tiles where the no. wins from that tile is noted
     CustomBitset visited_tiles; 
     CustomBitset used_magic_numbers;
-    vector<int> idxs(n); // keeps track of the next move
+    int idxs[N_MAX]; // keeps track of the next move
     for (int i = 0; i < n; i++) {
         idxs[i] = board[i] + i;
+        pre_wins[i] = 0;
     }
-    fill(pre_wins.begin(), pre_wins.end(), 0);
-    copy(board.begin(), board.end(), inserter(magic_numbers, magic_numbers.end()));
+    //fill(pre_wins.begin(), pre_wins.end(), 0);
+    //copy(board.begin(), board.end(), inserter(magic_numbers, magic_numbers.end()));
     for (int i = 0; i < n; i++) {
         visited_tiles.reset();
         used_magic_numbers.reset();
@@ -128,8 +130,8 @@ int main() {
     cout << "Enter the size of the board (n): ";
     cin >> n;
 
-    vector<int> board(n);
-
+    //vector<int> board(n);
+    int board[N_MAX];
     // Generate a random board with values between 0 and n-1
     for (int i = 0; i < n; i++) {
         int val;
